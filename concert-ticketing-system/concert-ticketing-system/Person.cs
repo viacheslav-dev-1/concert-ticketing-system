@@ -1,6 +1,6 @@
 ﻿namespace concert_ticketing_system
 {
-    public class Person : Entity
+    public class Person : Entity, IEntity
     {
         public override string FileName => "Person.txt";
 
@@ -59,6 +59,13 @@
             FirstName = parts[1];
             LastName = parts[2];
             Email = parts[3];
+        }
+
+        public bool Search(string searchString)
+        {
+            return FirstName!.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                   LastName!.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                   Email!.Contains(searchString, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿using System.Text;
-
-namespace concert_ticketing_system
+﻿namespace concert_ticketing_system
 {
-    public class Concert : Entity
+    public class Concert : Entity, IEntity
     {
         public override string FileName => "Concert.txt";
 
         public string? Name { get; set; }
+        public string? Description { get; set; }
         public TimeSpan? Duration { get; set; }
         public DateTime? StartDateTime { get; set; }
         public List<Performer>? Performers { get; set; }
@@ -14,17 +13,19 @@ namespace concert_ticketing_system
 
         public Concert()
         {
-            Name = string.Empty;
+            Name = " ";
+            Description = " ";
             Duration = null;
             StartDateTime = new DateTime();
             Performers = new List<Performer>();
             Visitors = new List<Visitor>();
         }
 
-        public Concert(Guid id, string name, TimeSpan? duration, DateTime? strartDateTime, List<Performer> performers, List<Visitor> visitors)
+        public Concert(Guid id, string name, string description, TimeSpan? duration, DateTime? strartDateTime, List<Performer> performers, List<Visitor> visitors)
             : base(id)
         {
             Name = name;
+            Description = description;
             Duration = duration;
             StartDateTime = strartDateTime ?? new DateTime();
             Performers = performers;
@@ -33,7 +34,7 @@ namespace concert_ticketing_system
 
         public new bool IsValid()
         {
-            return base.IsValid() && 
+            return base.IsValid() &&
                     !string.IsNullOrEmpty(Name) &&
                     Duration != null &&
                     StartDateTime != null &&
@@ -57,7 +58,7 @@ namespace concert_ticketing_system
             var performersIdStr = Performers.Count > 0 ? string.Join(",", performersId) : "empty";
             var visitorsIdStr = Visitors.Count > 0 ? string.Join(",", visitorsId) : "empty";
 
-            return $"{base.Format()}[{Name}][{Duration}][{StartDateTime.Value.ToUniversalTime()}][{performersIdStr}][{visitorsIdStr}]";
+            return $"{base.Format()}[{Name}][{Description}][{Duration}][{StartDateTime.Value.ToUniversalTime()}][{performersIdStr}][{visitorsIdStr}]";
         }
 
         public virtual void Parse(string record)
@@ -68,13 +69,13 @@ namespace concert_ticketing_system
             }
 
             var parts = record.Trim().Split(new[] { "][" }, StringSplitOptions.None);
-            if (parts.Length != 6)
+            if (parts.Length != 7)
             {
                 throw new FormatException("Invalid record format.");
             }
 
             parts[0] = parts[0].TrimStart('[');
-            parts[5] = parts[5].TrimEnd(']');
+            parts[6] = parts[6].TrimEnd(']');
 
             if (!Guid.TryParse(parts[0], out Guid id))
             {
@@ -83,20 +84,20 @@ namespace concert_ticketing_system
 
             string name = parts[1];
 
-            if (!TimeSpan.TryParse(parts[2], out TimeSpan duration))
+            if (!TimeSpan.TryParse(parts[3], out TimeSpan duration))
             {
                 throw new FormatException("Invalid duration format.");
             }
 
-            if (!DateTime.TryParse(parts[3], out DateTime startDateTime))
+            if (!DateTime.TryParse(parts[4], out DateTime startDateTime))
             {
                 throw new FormatException("Invalid start date/time format.");
             }
 
             var performers = new List<Performer>();
-            if (!string.IsNullOrEmpty(parts[4]))
+            if (!string.IsNullOrEmpty(parts[5]))
             {
-                var performerIds = parts[4].Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var performerIds = parts[5].Split(',', StringSplitOptions.RemoveEmptyEntries);
                 foreach (var performerId in performerIds)
                 {
                     if (Guid.TryParse(performerId, out Guid performerGuid))
@@ -107,9 +108,9 @@ namespace concert_ticketing_system
             }
 
             var visitors = new List<Visitor>();
-            if (!string.IsNullOrEmpty(parts[5]))
+            if (!string.IsNullOrEmpty(parts[6]))
             {
-                var visitorIds = parts[5].Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var visitorIds = parts[6].Split(',', StringSplitOptions.RemoveEmptyEntries);
                 foreach (var visitorId in visitorIds)
                 {
                     if (Guid.TryParse(visitorId, out Guid visitorGuid))
@@ -125,6 +126,12 @@ namespace concert_ticketing_system
             StartDateTime = startDateTime;
             Performers = performers;
             Visitors = visitors;
+        }
+
+        public bool Search(string searchString)
+        {
+            return Name!.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                   Description!.Contains(searchString, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

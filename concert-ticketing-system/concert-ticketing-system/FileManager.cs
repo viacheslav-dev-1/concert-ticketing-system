@@ -2,11 +2,11 @@
 {
     public static class FileManager
     {
-        public static void Add(Entity entity)
+        public static void WriteToFile(Entity entity)
         {
             if (entity == null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("Entity should not be null");
             }
 
             if (!entity.IsValid())
