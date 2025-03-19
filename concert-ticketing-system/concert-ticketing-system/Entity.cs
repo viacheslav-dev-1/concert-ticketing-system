@@ -2,7 +2,7 @@
 {
     public class Entity
     {
-        public virtual string FileName { get; }
+        public virtual string FileName { get; } = string.Empty;
 
         public Guid Id { get; set; }
 
@@ -24,10 +24,6 @@
         public virtual string Format()
         {
             return "["+Id.ToString()+"]";
-        }
-
-        public virtual void Parse(string record)
-        {
         }
     }
 }

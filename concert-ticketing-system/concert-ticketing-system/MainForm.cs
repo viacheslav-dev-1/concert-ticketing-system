@@ -1,5 +1,6 @@
 using MaterialSkin;
 using MaterialSkin.Controls;
+using System.Globalization;
 
 namespace concert_ticketing_system
 {
@@ -19,10 +20,6 @@ namespace concert_ticketing_system
                 Primary.Blue400, Primary.Blue700,
                 Primary.Blue100, Accent.LightBlue200,
                 TextShade.WHITE);
-
-            var entitites = FileManager.Read<Concert>("Concert.txt");
-
-            var s = 1;
         }
 
         private void addRecordBtn_Click(object sender, EventArgs e)
@@ -36,8 +33,9 @@ namespace concert_ticketing_system
                     duration = durationResult;
                 };
 
-                DateTime? startDateTime = DateTime.Now;
-                if (DateTime.TryParse(startTimeTextBox.Text, out var dateResult))
+                var startDateTime = DateTime.Now;
+                if (DateTime.TryParseExact(startTimeTextBox.Text, "dd/MM/yyyy hh:mm tt", 
+                    CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateResult))
                 {
                     startDateTime = dateResult;
                 };

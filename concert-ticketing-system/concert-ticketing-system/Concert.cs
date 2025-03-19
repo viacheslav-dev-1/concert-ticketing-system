@@ -60,7 +60,7 @@ namespace concert_ticketing_system
             return $"{base.Format()}[{Name}][{Duration}][{StartDateTime.Value.ToUniversalTime()}][{performersIdStr}][{visitorsIdStr}]";
         }
 
-        public override void Parse(string record)
+        public virtual void Parse(string record)
         {
             if (string.IsNullOrWhiteSpace(record))
             {
